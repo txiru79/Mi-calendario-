@@ -2,7 +2,7 @@ const CACHE = 'mi-calendario-v1';
 self.addEventListener('install', function (e) {
   e.waitUntil(
     caches.open(CACHE).then(function (c) {
-      return c.addAll(['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-180.png']);
+      return c.addAll(['./', './index.html', './manifest.webmanifest', './icon-512.png', './icon-180.png']);
     })
   );
 });
