@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#7D9076">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi calendario">
+<title>Mi calendario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Caveat:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F1E5; --paper:#FFFDF7; --paper2:#FBF6EC;
+  --ink:#3E3A33; --ink2:#6F675C; --muted:#9A9084;
+  --sage:#7D9076; --sage-dark:#5C7057; --sage-light:#E3EAD9; --sage-pale:#EFF3E6;
+  --terra:#C4835F; --terra-dark:#A96A4B; --terra-light:#F7E2D3; --terra-pale:#FCF0E6;
+  --gold:#C9A86A; --line:#E9DDC9; --line2:#DED0B8;
+  --shadow:0 10px 30px rgba(94,78,52,.10), 0 2px 8px rgba(94,78,52,.06);
+  --radius:20px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#21241E; --paper:#2B2E26; --paper2:#262922;
+    --ink:#F1EAD9; --ink2:#CFC6B2; --muted:#9C9584;
+    --sage:#9AB08F; --sage-dark:#B7C9AC; --sage-light:#394434; --sage-pale:#30382C;
+    --terra:#D89A76; --terra-dark:#E8B08D; --terra-light:#4A3428; --terra-pale:#3D2E24;
+    --gold:#C9A86A; --line:#43463A; --line2:#4E5142;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito Sans",system-ui,sans-serif;font-size:16px;line-height:1.5;
+  background-image:radial-gradient(rgba(125,144,118,.06) 1px, transparent 1px);background-size:22px 22px}
+button,[role="button"],select,input,textarea{font:inherit}
+button{min-height:44px;cursor:pointer}
+.wrap{max-width:680px;margin:0 auto;padding:18px 16px 40px}
+
+/* ---------- HERO / COUNTDOWN ---------- */
+.hero{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:26px 20px 22px;overflow:hidden;text-align:center}
+.hero::before{content:"";position:absolute;inset:9px;border:1.5px dashed var(--line2);border-radius:17px;pointer-events:none;opacity:.9}
+.hero .tape{position:absolute;top:-2px;left:50%;transform:translateX(-50%) rotate(-1.5deg);width:118px;height:26px;background:rgba(125,144,118,.28);border-left:1px dashed rgba(255,255,255,.5);border-right:1px dashed rgba(255,255,255,.5)}
+.leaf{position:absolute;opacity:.55;pointer-events:none}
+.leaf.tl{top:10px;left:10px}.leaf.br{bottom:10px;right:10px;transform:rotate(180deg)}
+.hero h1{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:600;margin:10px 0 2px;letter-spacing:.01em}
+.hero .hand{font-family:"Caveat",cursive;font-size:22px;color:var(--sage-dark);margin:0}
+.wreath{position:relative;width:196px;height:196px;margin:16px auto 6px}
+.wreath svg.ring{position:absolute;inset:0;width:100%;height:100%}
+.wreath .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 22px}
+.wreath .num{font-family:"Cormorant Garamond",serif;font-size:74px;line-height:.95;font-weight:700;color:var(--terra-dark)}
+.wreath .num.small{font-size:30px;line-height:1.1}
+.wreath .unit{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-top:2px}
+.hero .next{font-size:16.5px;margin:8px 6px 2px}
+.hero .next strong{color:var(--terra-dark)}
+.hero .range{color:var(--ink2);font-size:14.5px;margin:2px 6px 0}
+.hero .empty-note{color:var(--ink2);font-size:15px;margin:10px 10px 4px}
+.stats{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;position:relative}
+.stat{background:var(--paper2);border:1px solid var(--line);border-radius:14px;padding:9px 14px;min-width:104px}
+.stat b{display:block;font-family:"Cormorant Garamond",serif;font-size:23px;line-height:1;color:var(--sage-dark)}
+.stat span{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.btn-main{margin-top:18px;position:relative;background:var(--terra);color:#FFF8F0;border:none;border-radius:999px;padding:13px 26px;font-weight:800;font-size:16px;box-shadow:0 6px 16px rgba(169,106,75,.30);width:100%;max-width:340px}
+.btn-main:active{transform:scale(.98)}
+.btn-main.marked{background:var(--sage-dark);box-shadow:0 6px 16px rgba(92,112,87,.30)}
+
+/* ---------- SECTIONS ---------- */
+.card{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 16px 16px;margin-top:18px}
+.card h2{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:600;margin:0 0 4px}
+.card .sub{font-family:"Caveat",cursive;font-size:19px;color:var(--sage-dark);margin:0 0 8px}
+.tape-sm{position:absolute;top:-11px;left:26px;width:84px;height:22px;background:rgba(201,168,106,.30);transform:rotate(-2deg);border-radius:2px}
+
+/* calendar */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.cal-head .month{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:700;text-transform:capitalize}
+.navbtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper2);color:var(--ink);font-size:20px;display:flex;align-items:center;justify-content:center;padding:0}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day{position:relative;border:none;background:transparent;color:var(--ink);border-radius:50%;aspect-ratio:1/1;min-height:44px;font-size:15.5px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0}
+.day.out{opacity:.28}
+.day.today{box-shadow:inset 0 0 0 2px var(--gold)}
+.day.sel{box-shadow:inset 0 0 0 2px var(--ink)}
+.day.today.sel{box-shadow:inset 0 0 0 2px var(--gold), inset 0 0 0 4px var(--paper), inset 0 0 0 6px var(--ink)}
+.day.period{background:var(--terra);color:#FFF8F0;font-weight:800}
+.day.period.sel{box-shadow:inset 0 0 0 2px var(--paper), inset 0 0 0 4px var(--terra-dark)}
+.day.pred{background:var(--terra-pale);color:var(--terra-dark);box-shadow:inset 0 0 0 1.5px var(--terra);border-radius:50%}
+.day.pred::after{content:"";position:absolute;inset:3px;border:1.5px dashed var(--terra);border-radius:50%;opacity:.65}
+.day.fertile{background:var(--sage-pale);color:var(--sage-dark)}
+.day.ovul{background:var(--sage);color:#fff;font-weight:800}
+.day.ovul::before{content:"";position:absolute;top:4px;right:7px;width:5px;height:5px;border-radius:50%;background:#fff;opacity:.9}
+.day .dot{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.day.period .dot{background:#FFE9D6}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:14px;font-size:13px;color:var(--ink2)}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:-2px;margin-right:5px}
+.lg-period{background:var(--terra)} .lg-pred{background:var(--terra-pale);box-shadow:inset 0 0 0 1.5px var(--terra)} .lg-fert{background:var(--sage-light)} .lg-ovul{background:var(--sage)}
+
+/* day detail */
+.detail{display:none}
+.detail.open{display:block}
+.detail .date-line{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;text-transform:capitalize;margin:0}
+.detail .hint{color:var(--ink2);font-size:14px;margin:2px 0 12px}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border-radius:999px;border:1.5px solid var(--line2);background:var(--paper2);color:var(--ink2);font-weight:800;padding:10px 18px;font-size:15px}
+.btn.on{background:var(--terra);border-color:var(--terra);color:#FFF8F0}
+.btn.ghost{border-color:var(--line2);background:var(--paper2);color:var(--ink2)}
+.group-label{font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1.5px solid var(--line2);background:var(--paper2);color:var(--ink);border-radius:999px;padding:9px 15px;font-weight:700;font-size:14.5px;min-height:42px}
+.pill.on{border-color:var(--sage-dark);background:var(--sage-light);color:var(--sage-dark)}
+textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;background:var(--paper2);color:var(--ink);padding:11px 12px;min-height:64px;resize:vertical}
+textarea:focus,.pill:focus-visible,.btn:focus-visible,.day:focus-visible,.navbtn:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+
+/* history */
+.hist{list-style:none;margin:6px 0 0;padding:0}
+.hist li{display:flex;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px dashed var(--line2);font-size:15px}
+.hist li:last-child{border-bottom:none}
+.hist .when{font-weight:700}
+.hist .meta{color:var(--ink2);text-align:right;font-size:14px}
+.empty{color:var(--ink2);font-size:15px;padding:8px 0 2px}
+.empty .hand{font-family:"Caveat",cursive;font-size:20px;color:var(--sage-dark)}
+
+/* settings + backup */
+.field{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line2)}
+.field:last-of-type{border-bottom:none}
+.field label{font-size:15px;font-weight:600}
+.field small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.field input{width:76px;text-align:center;border:1.5px solid var(--line);border-radius:10px;background:var(--paper2);color:var(--ink);padding:9px 6px;font-weight:700;min-height:44px}
+.backup-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.small-note{color:var(--muted);font-size:13.5px;margin-top:12px}
+footer{text-align:center;margin-top:22px;color:var(--muted);font-size:13px}
+footer .hand{font-family:"Caveat",cursive;font-size:19px;color:var(--sage-dark)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:700;font-size:14.5px;box-shadow:var(--shadow);transition:transform .25s ease;z-index:50;max-width:88vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}.btn-main:active{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- CUENTA ATRÁS -->
+  <section class="hero" aria-label="Resumen">
+    <div class="tape" aria-hidden="true"></div>
+    <svg class="leaf tl" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true"><path d="M8 44C8 24 22 10 44 8c-2 22-16 36-36 36Z" fill="#7D9076" opacity=".35"/><path d="M10 42C18 30 28 20 40 12" stroke="#5C7057" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <svg class="leaf br" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true"><path d="M8 44C8 24 22 10 44 8c-2 22-16 36-36 36Z" fill="#C4835F" opacity=".30"/><path d="M10 42C18 30 28 20 40 12" stroke="#A96A4B" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <p class="hand">tu libreta de días</p>
+    <h1>Mi calendario</h1>
+    <div class="wreath" aria-hidden="true">
+      <svg class="ring" viewBox="0 0 200 200" fill="none">
+        <circle cx="100" cy="100" r="86" stroke="#E9DDC9" stroke-width="1.5" stroke-dasharray="3 6"/>
+        <g stroke="#7D9076" stroke-width="2" stroke-linecap="round" fill="#7D9076">
+          <path d="M100 8a92 92 0 0 1 40 10" fill="none" opacity=".0"/>
+        </g>
+        <g fill="#8A9B84">
+          <ellipse cx="100" cy="10" rx="5" ry="9"/><ellipse cx="126" cy="16" rx="5" ry="9" transform="rotate(28 126 16)"/><ellipse cx="150" cy="30" rx="5" ry="9" transform="rotate(52 150 30)"/><ellipse cx="168" cy="52" rx="5" ry="9" transform="rotate(74 168 52)"/><ellipse cx="180" cy="78" rx="5" ry="9" transform="rotate(94 180 78)"/><ellipse cx="183" cy="106" rx="5" ry="9" transform="rotate(112 183 106)"/><ellipse cx="176" cy="134" rx="5" ry="9" transform="rotate(130 176 134)"/><ellipse cx="160" cy="158" rx="5" ry="9" transform="rotate(148 160 158)"/><ellipse cx="136" cy="176" rx="5" ry="9" transform="rotate(164 136 176)"/><ellipse cx="108" cy="185" rx="5" ry="9" transform="rotate(178 108 185)"/><ellipse cx="80" cy="184" rx="5" ry="9" transform="rotate(196 80 184)"/><ellipse cx="54" cy="172" rx="5" ry="9" transform="rotate(214 54 172)"/><ellipse cx="33" cy="150" rx="5" ry="9" transform="rotate(234 33 150)"/><ellipse cx="20" cy="122" rx="5" ry="9" transform="rotate(254 20 122)"/><ellipse cx="17" cy="92" rx="5" ry="9" transform="rotate(272 17 92)"/><ellipse cx="24" cy="62" rx="5" ry="9" transform="rotate(292 24 62)"/><ellipse cx="40" cy="36" rx="5" ry="9" transform="rotate(312 40 36)"/><ellipse cx="64" cy="18" rx="5" ry="9" transform="rotate(334 64 18)"/>
+        </g>
+        <circle cx="100" cy="190" r="3.5" fill="#C4835F"/><circle cx="88" cy="188" r="2.5" fill="#C9A86A"/><circle cx="112" cy="188" r="2.5" fill="#C9A86A"/>
+      </svg>
+      <div class="center" id="wreathCenter"></div>
+    </div>
+    <div id="heroText"></div>
+    <div class="stats" id="stats"></div>
+    <button class="btn-main" id="btnToday" type="button">Apuntar que me ha bajado hoy</button>
+  </section>
+
+  <!-- CALENDARIO -->
+  <section class="card" aria-label="Calendario">
+    <div class="tape-sm" aria-hidden="true"></div>
+    <div class="cal-head">
+      <button class="navbtn" id="prevMonth" type="button" aria-label="Mes anterior">‹</button>
+      <div class="month" id="monthName"></div>
+      <button class="navbtn" id="nextMonth" type="button" aria-label="Mes siguiente">›</button>
+    </div>
+    <div class="dow" aria-hidden="true"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+    <div class="grid" id="calGrid"></div>
+    <div class="legend">
+      <span><i class="lg-period"></i>Tus días</span>
+      <span><i class="lg-pred"></i>Prevista</span>
+      <span><i class="lg-fert"></i>Días fértiles</span>
+      <span><i class="lg-ovul"></i>Ovulación</span>
+    </div>
+    <p class="small-note">Toca un día para apuntarlo o para escribir cómo te encuentras.</p>
+  </section>
+
+  <!-- DÍA ELEGIDO -->
+  <section class="card detail" id="detail" aria-label="Día elegido">
+    <div class="tape-sm" aria-hidden="true"></div>
+    <p class="date-line" id="detailDate"></p>
+    <p class="hint" id="detailHint"></p>
+    <div class="row-btns">
+      <button class="btn" id="btnPeriod" type="button">Día de regla</button>
+      <button class="btn ghost" id="btnClear" type="button">Quitar marca</button>
+    </div>
+    <p class="group-label">Cantidad</p>
+    <div class="pills" data-group="flow">
+      <button class="pill" type="button" data-val="Poco">Poco</button>
+      <button class="pill" type="button" data-val="Normal">Normal</button>
+      <button class="pill" type="button" data-val="Mucho">Mucho</button>
+    </div>
+    <p class="group-label">¿Cómo te encuentras?</p>
+    <div class="pills" data-group="body">
+      <button class="pill" type="button" data-val="Bien">Bien</button>
+      <button class="pill" type="button" data-val="Dolor leve">Dolor leve</button>
+      <button class="pill" type="button" data-val="Dolor fuerte">Dolor fuerte</button>
+      <button class="pill" type="button" data-val="Cansada">Cansada</button>
+      <button class="pill" type="button" data-val="Hinchada">Hinchada</button>
+    </div>
+    <p class="group-label">Ánimo</p>
+    <div class="pills" data-group="mood">
+      <button class="pill" type="button" data-val="Tranquila">Tranquila</button>
+      <button class="pill" type="button" data-val="Contenta">Contenta</button>
+      <button class="pill" type="button" data-val="Sensible">Sensible</button>
+      <button class="pill" type="button" data-val="Irritable">Irritable</button>
+      <button class="pill" type="button" data-val="Baja">Baja</button>
+    </div>
+    <p class="group-label">Nota para ti</p>
+    <textarea id="note" placeholder="Escribe lo que quieras recordar de este día…"></textarea>
+  </section>
+
+  <!-- HISTORIAL -->
+  <section class="card" aria-label="Historial">
+    <div class="tape-sm" aria-hidden="true"></div>
+    <h2>Tu historial</h2>
+    <p class="sub">así ves si algo cambia con el tiempo</p>
+    <div id="history"></div>
+  </section>
+
+  <!-- AJUSTES Y COPIA -->
+  <section class="card" aria-label="Ajustes">
+    <div class="tape-sm" aria-hidden="true"></div>
+    <h2>A tu medida</h2>
+    <p class="sub">solo si lo sabes, si no lo calcula sola</p>
+    <div class="field">
+      <label for="inpCycle">Días entre una regla y otra<small>Lo normal está entre 21 y 35 días</small></label>
+      <input id="inpCycle" type="number" min="21" max="45" step="1" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label for="inpLen">Días que te suele durar<small>Se usa para pintar la próxima en el calendario</small></label>
+      <input id="inpLen" type="number" min="2" max="10" step="1" inputmode="numeric">
+    </div>
+    <div class="backup-btns">
+      <button class="btn ghost" id="btnExport" type="button">Descargar una copia</button>
+      <label class="btn ghost" for="fileImport" style="display:inline-flex;align-items:center;min-height:44px;cursor:pointer">Recuperar una copia</label>
+      <input id="fileImport" type="file" accept="application/json,.json" hidden>
+    </div>
+    <p class="small-note">Tus apuntes se guardan solo en este móvil. No van a ningún servidor ni a la cuenta de la familia. Si cambias de móvil, descárgate una copia y recupérala en el nuevo.</p>
+  </section>
+
+  <footer>
+    <span class="hand">hecho con cariño, solo para ti</span><br>
+    Las fechas son una estimación. Cada cuerpo es distinto y ningún calendario acierta siempre.
+  </footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="mi-calendario-v1";
+var state={period:{},notes:{},cycle:28,len:5};
+try{var raw=localStorage.getItem(KEY); if(raw){var p=JSON.parse(raw); if(p&&typeof p==="object"){state.period=p.period||{}; state.notes=p.notes||{}; state.cycle=p.cycle||28; state.len=p.len||5;}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function pad(n){return (n<10?"0":"")+n;}
+function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function parse(s){var a=s.split("-");return new Date(+a[0],+a[1]-1,+a[2]);}
+function addDays(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x;}
+function diffDays(a,b){return Math.round((parse(iso(a))-parse(iso(b)))/86400000);}
+function today(){var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate());}
+var MONTHS=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+function fmtLong(d){return d.getDate()+" de "+MONTHS[d.getMonth()];}
+function fmtFull(d){return d.getDate()+" de "+MONTHS[d.getMonth()]+" de "+d.getFullYear();}
+
+function periodDates(){return Object.keys(state.period).filter(function(k){return state.period[k];}).sort();}
+function groups(){
+  var ds=periodDates().map(parse); var out=[]; var cur=null;
+  ds.forEach(function(d){ if(!cur){cur={start:d,end:d,days:1};out.push(cur);return;}
+    var gap=diffDays(d,cur.end);
+    if(gap<=2){cur.end=d;cur.days+=gap===1?1:0; if(gap>1){/* hueco corto cuenta como mismo ciclo */}}
+    else{cur={start:d,end:d,days:1};out.push(cur);} });
+  return out;
+}
+function cycleLengths(){var g=groups();var out=[];for(var i=1;i<g.length;i++){out.push(diffDays(g[i].start,g[i-1].start));}return out.filter(function(n){return n>=15&&n<=60;});}
+function avgCycle(){var c=cycleLengths();if(!c.length)return state.cycle;var last=c.slice(-6);return Math.round(last.reduce(function(a,b){return a+b;},0)/last.length);}
+function avgLen(){var g=groups().filter(function(x){return x.days>1;});if(!g.length)return state.len;var last=g.slice(-6);return Math.max(2,Math.min(10,Math.round(last.reduce(function(a,x){return a+x.days;},0)/last.length)));}
+function variation(){var c=cycleLengths().slice(-6);if(c.length<2)return 2;var a=avgCycle();var m=0;c.forEach(function(n){m=Math.max(m,Math.abs(n-a));});return Math.max(1,Math.min(5,m));}
+function prediction(){
+  var g=groups(); if(!g.length)return null;
+  var last=g[g.length-1]; var avg=avgCycle(); var next=addDays(last.start,avg);
+  var ovul=addDays(next,-14);
+  return {lastStart:last.start,lastEnd:last.end,next:next,ovul:ovul,fertStart:addDays(ovul,-5),fertEnd:addDays(ovul,1),from:addDays(next,-variation()),to:addDays(next,variation()),avg:avg,len:avgLen()};
+}
+function isPredicted(s,pred){
+  if(!pred)return false;
+  // próximas dos ventanas previstas
+  for(var k=0;k<2;k++){var start=addDays(pred.next,pred.avg*k);var end=addDays(start,pred.len-1);var d=parse(s);if(d>=start&&d<=end)return true;}
+  return false;
+}
+function phaseOf(s,pred){
+  if(!pred)return null; var d=parse(s);
+  for(var k=-1;k<2;k++){var next=addDays(pred.next,pred.avg*k);var ov=addDays(next,-14);
+    if(iso(d)===iso(ov))return "ovul";
+    if(d>=addDays(ov,-5)&&d<=addDays(ov,1))return "fertile";}
+  return null;
+}
+
+var cursor=new Date(today().getFullYear(),today().getMonth(),1);
+var selected=iso(today());
+
+var $=function(id){return document.getElementById(id);};
+var toastTimer=null;
+function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove("show");},2400);}
+
+function renderHero(){
+  var pred=prediction(); var t=today(); var center=$("wreathCenter"); var hero=$("heroText"); var stats=$("stats");
+  var g=groups();
+  if(!pred){
+    center.innerHTML='<div class="num small">Tu<br>calendario</div><div class="unit">empieza hoy</div>';
+    hero.innerHTML='<p class="empty-note">Todavía no has apuntado ningún día.<br>Cuando te baje, toca el botón de abajo o el día en el calendario. A partir de ahí, ella sola te dirá cuándo te toca la siguiente.</p>';
+  } else {
+    var daysTo=diffDays(pred.next,t);
+    var inPeriod = t>=pred.lastStart && (function(){var gg=groups();var last=gg[gg.length-1];return t<=last.end;})();
+    if(inPeriod){
+      center.innerHTML='<div class="num small">Estás en<br>tus días</div><div class="unit">cuídate</div>';
+      hero.innerHTML='<p class="next">Empezó el <strong>'+fmtLong(pred.lastStart)+'</strong>.</p><p class="range">La siguiente te tocaría sobre el '+fmtLong(pred.next)+'.</p>';
+    } else if(daysTo>0){
+      center.innerHTML='<div class="num">'+daysTo+'</div><div class="unit">'+(daysTo===1?"día":"días")+'</div>';
+      hero.innerHTML='<p class="next">Tu próxima regla: <strong>'+fmtLong(pred.next)+'</strong></p><p class="range">Puede adelantarse o atrasarse un poco: entre el '+fmtLong(pred.from)+' y el '+fmtLong(pred.to)+'.</p><p class="range">Ovulación sobre el '+fmtLong(pred.ovul)+' · días fértiles del '+fmtLong(pred.fertStart)+' al '+fmtLong(pred.fertEnd)+'.</p>';
+    } else if(daysTo===0){
+      center.innerHTML='<div class="num small">Te toca<br>hoy</div><div class="unit">sobre hoy</div>';
+      hero.innerHTML='<p class="next">La estimación dice <strong>hoy, '+fmtLong(pred.next)+'</strong>.</p><p class="range">Si te baja, apúntalo y la cuenta vuelve a empezar.</p>';
+    } else {
+      var late=-daysTo;
+      center.innerHTML='<div class="num">'+late+'</div><div class="unit">'+(late===1?"día de retraso":"días de retraso")+'</div>';
+      hero.innerHTML='<p class="next">Te tocaba sobre el <strong>'+fmtLong(pred.next)+'</strong>.</p><p class="range">Los ciclos cambian a veces. Cuando te baje, apúntalo y se recalcula todo.</p>';
+    }
+  }
+  var cl=cycleLengths();
+  if(!g.length){
+    stats.innerHTML=
+      '<div class="stat"><b>'+state.cycle+' días</b><span>orientativo para empezar</span></div>'+
+      '<div class="stat"><b>'+state.len+' días</b><span>duración orientativa</span></div>'+
+      '<div class="stat"><b>0</b><span>reglas apuntadas</span></div>';
+  } else {
+    stats.innerHTML=
+      '<div class="stat"><b>'+avgCycle()+' días</b><span>'+(cl.length?"tu ciclo medio":"ciclo para empezar")+'</span></div>'+
+      '<div class="stat"><b>'+avgLen()+' días</b><span>'+(g.some(function(x){return x.days>1;})?"te suele durar":"duración orientativa")+'</span></div>'+
+      '<div class="stat"><b>'+g.length+'</b><span>'+(g.length===1?"regla apuntada":"reglas apuntadas")+'</span></div>';
+  }
+  var btn=$("btnToday"); var isToday=!!state.period[iso(today())];
+  btn.textContent=isToday?"Hoy ya está apuntado ✓":"Apuntar que me ha bajado hoy";
+  btn.classList.toggle("marked",isToday);
+}
+
+function renderCalendar(){
+  $("monthName").textContent=MONTHS[cursor.getMonth()]+" "+cursor.getFullYear();
+  var pred=prediction();
+  var first=new Date(cursor.getFullYear(),cursor.getMonth(),1);
+  var startOffset=(first.getDay()+6)%7; // lunes primero
+  var gridStart=addDays(first,-startOffset);
+  var html="";
+  for(var i=0;i<42;i++){
+    var d=addDays(gridStart,i); var s=iso(d);
+    var cls=["day"];
+    if(d.getMonth()!==cursor.getMonth())cls.push("out");
+    if(s===iso(today()))cls.push("today");
+    if(s===selected)cls.push("sel");
+    var ph=phaseOf(s,pred);
+    if(state.period[s])cls.push("period");
+    else if(isPredicted(s,pred))cls.push("pred");
+    else if(ph==="ovul")cls.push("ovul");
+    else if(ph==="fertile")cls.push("fertile");
+    var hasNote=state.notes[s]&&(state.notes[s].flow||state.notes[s].body||state.notes[s].mood||state.notes[s].text);
+    html+='<button type="button" class="'+cls.join(" ")+'" data-date="'+s+'" aria-label="'+fmtFull(d)+'">'+d.getDate()+(hasNote?'<span class="dot"></span>':"")+'</button>';
+  }
+  $("calGrid").innerHTML=html;
+  var btns=$("calGrid").querySelectorAll(".day");
+  for(var j=0;j<btns.length;j++){btns[j].addEventListener("click",function(){selected=this.getAttribute("data-date");renderCalendar();renderDetail();document.getElementById("detail").scrollIntoView({behavior:"smooth",block:"nearest"});});}
+}
+
+function renderDetail(){
+  var box=$("detail"); box.classList.add("open");
+  var d=parse(selected);
+  $("detailDate").textContent=fmtFull(d);
+  var pred=prediction(); var hints=[];
+  if(state.period[selected])hints.push("Día de regla apuntado.");
+  else if(pred&&isPredicted(selected,pred))hints.push("Día previsto para la próxima regla.");
+  var ph=pred?phaseOf(selected,pred):null;
+  if(ph==="ovul")hints.push("Día estimado de ovulación.");
+  else if(ph==="fertile")hints.push("Día fértil estimado.");
+  if(selected===iso(today()))hints.push("Es hoy.");
+  $("detailHint").textContent=hints.length?hints.join(" "):"Sin apuntes en este día.";
+  $("btnPeriod").classList.toggle("on",!!state.period[selected]);
+  $("btnPeriod").textContent=state.period[selected]?"Día de regla ✓":"Día de regla";
+  var n=state.notes[selected]||{};
+  var groupsEls=document.querySelectorAll(".pills");
+  groupsEls.forEach(function(gEl){
+    var key=gEl.getAttribute("data-group");
+    var pills=gEl.querySelectorAll(".pill");
+    pills.forEach(function(p){p.classList.toggle("on",n[key]===p.getAttribute("data-val"));});
+  });
+  var ta=$("note"); if(document.activeElement!==ta)ta.value=n.text||"";
+}
+
+function renderHistory(){
+  var g=groups().slice().reverse(); var box=$("history");
+  if(!g.length){box.innerHTML='<p class="empty"><span class="hand">tu primera página está en blanco…</span><br>Apunta el primer día que te baje y aquí irá saliendo tu historial, mes a mes.</p>';return;}
+  var lens=cycleLengths();
+  var html='<ul class="hist">';
+  g.forEach(function(gr,idx){
+    var realIdx=g.length-1-idx;
+    var cyc=realIdx>0?lens[realIdx-1]:null;
+    html+='<li><span class="when">'+fmtLong(gr.start)+(gr.end>gr.start?" – "+fmtLong(gr.end):"")+'</span><span class="meta">'+gr.days+(gr.days===1?" día":" días")+(cyc?" · ciclo de "+cyc+" días":"")+'</span></li>';
+  });
+  html+="</ul>";
+  box.innerHTML=html;
+}
+
+function renderAll(){renderHero();renderCalendar();renderDetail();renderHistory();$("inpCycle").value=state.cycle;$("inpLen").value=state.len;}
+
+$("btnToday").addEventListener("click",function(){
+  var s=iso(today());
+  if(state.period[s]){delete state.period[s];toast("Marca de hoy quitada");}
+  else{state.period[s]=true;toast("Apuntado. Que te sea leve");}
+  save();renderAll();
+});
+$("prevMonth").addEventListener("click",function(){cursor=new Date(cursor.getFullYear(),cursor.getMonth()-1,1);renderCalendar();});
+$("nextMonth").addEventListener("click",function(){cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);renderCalendar();});
+$("btnPeriod").addEventListener("click",function(){
+  if(state.period[selected])delete state.period[selected]; else state.period[selected]=true;
+  save();renderAll();
+});
+$("btnClear").addEventListener("click",function(){
+  delete state.period[selected]; delete state.notes[selected]; save();renderAll();toast("Día limpio");
+});
+document.querySelectorAll(".pills").forEach(function(gEl){
+  var key=gEl.getAttribute("data-group");
+  gEl.querySelectorAll(".pill").forEach(function(p){
+    p.addEventListener("click",function(){
+      var n=state.notes[selected]||(state.notes[selected]={});
+      if(n[key]===p.getAttribute("data-val"))delete n[key]; else n[key]=p.getAttribute("data-val");
+      if(!n.flow&&!n.body&&!n.mood&&!n.text)delete state.notes[selected];
+      save();renderCalendar();renderDetail();
+    });
+  });
+});
+$("note").addEventListener("input",function(){
+  var n=state.notes[selected]||(state.notes[selected]={});
+  n.text=this.value;
+  if(!n.flow&&!n.body&&!n.mood&&!n.text)delete state.notes[selected];
+  save();renderCalendar();
+});
+$("inpCycle").addEventListener("change",function(){var v=parseInt(this.value,10);if(v>=21&&v<=45){state.cycle=v;save();renderAll();toast("Guardado");}else{this.value=state.cycle;}});
+$("inpLen").addEventListener("change",function(){var v=parseInt(this.value,10);if(v>=2&&v<=10){state.len=v;save();renderAll();toast("Guardado");}else{this.value=state.len;}});
+$("btnExport").addEventListener("click",function(){
+  var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mi-calendario-copia.json";document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},2000);toast("Copia descargada");
+});
+$("fileImport").addEventListener("change",function(){
+  var f=this.files&&this.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){try{var p=JSON.parse(r.result);if(p&&typeof p==="object"&&p.period){state.period=p.period||{};state.notes=p.notes||{};state.cycle=p.cycle||28;state.len=p.len||5;save();renderAll();toast("Copia recuperada");}else{toast("Ese archivo no vale");}}catch(e){toast("Ese archivo no vale");}};
+  r.readAsText(f); this.value="";
+});
+
+renderAll();
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(function(){}); }
+</script>
+</body>
+</html>
