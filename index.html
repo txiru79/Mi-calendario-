@@ -35,6 +35,22 @@
     --shadow:0 10px 30px rgba(0,0,0,.35);
   }
 }
+html[data-theme="light"]{
+  --bg:#F7F1E5; --paper:#FFFDF7; --paper2:#FBF6EC;
+  --ink:#3E3A33; --ink2:#6F675C; --muted:#9A9084;
+  --sage:#7D9076; --sage-dark:#5C7057; --sage-light:#E3EAD9; --sage-pale:#EFF3E6;
+  --terra:#C4835F; --terra-dark:#A96A4B; --terra-light:#F7E2D3; --terra-pale:#FCF0E6;
+  --gold:#C9A86A; --line:#E9DDC9; --line2:#DED0B8;
+  --shadow:0 10px 30px rgba(94,78,52,.10), 0 2px 8px rgba(94,78,52,.06);
+}
+html[data-theme="dark"]{
+  --bg:#21241E; --paper:#2B2E26; --paper2:#262922;
+  --ink:#F1EAD9; --ink2:#CFC6B2; --muted:#9C9584;
+  --sage:#9AB08F; --sage-dark:#B7C9AC; --sage-light:#394434; --sage-pale:#30382C;
+  --terra:#D89A76; --terra-dark:#E8B08D; --terra-light:#4A3428; --terra-pale:#3D2E24;
+  --gold:#C9A86A; --line:#43463A; --line2:#4E5142;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito Sans",system-ui,sans-serif;font-size:16px;line-height:1.5;
@@ -45,6 +61,7 @@ button{min-height:44px;cursor:pointer}
 
 /* ---------- HERO / COUNTDOWN ---------- */
 .hero{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:26px 20px 22px;overflow:hidden;text-align:center}
+.themebtn{position:absolute;top:12px;right:12px;z-index:2;min-height:36px;width:36px;border-radius:50%;border:1px solid var(--line);background:var(--paper2);color:var(--ink2);font-size:18px;line-height:1;padding:0}
 .hero::before{content:"";position:absolute;inset:9px;border:1.5px dashed var(--line2);border-radius:17px;pointer-events:none;opacity:.9}
 .hero .tape{position:absolute;top:-2px;left:50%;transform:translateX(-50%) rotate(-1.5deg);width:118px;height:26px;background:rgba(125,144,118,.28);border-left:1px dashed rgba(255,255,255,.5);border-right:1px dashed rgba(255,255,255,.5)}
 .leaf{position:absolute;opacity:.55;pointer-events:none}
@@ -144,6 +161,7 @@ footer .hand{font-family:"Caveat",cursive;font-size:19px;color:var(--sage-dark)}
 
   <!-- CUENTA ATRÁS -->
   <section class="hero" aria-label="Resumen">
+    <button class="themebtn" id="btnTheme" type="button" aria-label="Cambiar entre claro y oscuro">☾</button>
     <div class="tape" aria-hidden="true"></div>
     <svg class="leaf tl" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true"><path d="M8 44C8 24 22 10 44 8c-2 22-16 36-36 36Z" fill="#7D9076" opacity=".35"/><path d="M10 42C18 30 28 20 40 12" stroke="#5C7057" stroke-width="1.6" stroke-linecap="round"/></svg>
     <svg class="leaf br" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true"><path d="M8 44C8 24 22 10 44 8c-2 22-16 36-36 36Z" fill="#C4835F" opacity=".30"/><path d="M10 42C18 30 28 20 40 12" stroke="#A96A4B" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -264,6 +282,17 @@ var KEY="mi-calendario-v1";
 var state={period:{},notes:{},cycle:28,len:5};
 try{var raw=localStorage.getItem(KEY); if(raw){var p=JSON.parse(raw); if(p&&typeof p==="object"){state.period=p.period||{}; state.notes=p.notes||{}; state.cycle=p.cycle||28; state.len=p.len||5;}}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+var themeBtn=document.getElementById("btnTheme");
+function themeDark(){var a=document.documentElement.getAttribute("data-theme");if(a)return a==="dark";return window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function paintThemeBtn(){themeBtn.textContent=themeDark()?"☀":"☾";}
+try{var st=localStorage.getItem("mi-calendario-tema");if(st==="light"||st==="dark")document.documentElement.setAttribute("data-theme",st);}catch(e){}
+paintThemeBtn();
+themeBtn.addEventListener("click",function(){
+  var next=themeDark()?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  try{localStorage.setItem("mi-calendario-tema",next);}catch(e){}
+  paintThemeBtn();
+});
 function pad(n){return (n<10?"0":"")+n;}
 function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
 function parse(s){var a=s.split("-");return new Date(+a[0],+a[1]-1,+a[2]);}
